@@ -2,7 +2,7 @@
 
 # Enchanter
 
-Enchanter is a tool for XChaCha30Poly1305 AEAD file encryption.
+Enchanter is a tool for XChaCha20Poly1305 AEAD file encryption.
 
 There is an additional integrity checking mechanism with SHA3.
 
@@ -25,7 +25,7 @@ Argon2 round 1: supplied password + fixed1 ->
 
 This is an "overkill" amount of Argon2, as 1 round of Argon2 is already plenty in most situations.
 
-The XChaCha30Poly1305 AEAD uses that final key material and a NONCE IV that has time data and random data from the system.
+The XChaCha20Poly1305 AEAD uses that final key material and a NONCE IV that has time data and random data from the system.
 
 See https://github.com/jpegleg/enchantress for AES-256 file encryption - otherwise the tool is the mostly the same.
 
