@@ -64,7 +64,7 @@ ciphertext_hash = "{}"
 creation_time = "{}"
 "#,
         ciphertext_path, ciphertext_hash, readi
-        );
+    );
     let json_started = false;
     let mut file = try_print_json!(
         File::create("./enchanter.toml").map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open enchanter.toml: {}", e))),
