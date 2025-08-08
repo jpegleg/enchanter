@@ -101,7 +101,6 @@ Example:
 ciphertext_path = "my_data.e"
 ciphertext_hash = "xshPOXhtqGJtBoIj/vvxWSh55hryEOMYRqOeedH0hJJccH/edQSUqXxkGvvaFNeJfL9NOaAVUdav4z1tAkn+/A=="
 creation_time = "2025-07-13 19:15:32.334352329 UTC"
-mode = "CTR"
 ```
 
 The `ciphertext_hash` is not a secret itself and can be safely shared.
@@ -214,7 +213,7 @@ Fun fact: emojis can be used in passwords in most cases and can create very stro
 ## The file_password.toml file
 
 The optional key material file `file_password.toml` can be used instead of a password or environment variable.
-If a file_password.toml is used for encryption, that same file_password.toml will be required for decryption.
+If a file_password.toml is used for encryption, that same password from the file_password.toml will be required for decryption.
 
 The file is constructed as a single key value pair:
 
