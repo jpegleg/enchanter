@@ -27,7 +27,7 @@ This is an "overkill" amount of Argon2, as 1 round of Argon2 is already plenty i
 
 The XChaCha20Poly1305 AEAD uses that final key material and a NONCE IV that has time data and random data from the system.
 
-See https://github.com/jpegleg/enchantress for AES-256 file encryption - otherwise the tool is the mostly the same.
+See https://github.com/jpegleg/enchantress for AES-256 file encryption with a similar tool.
 
 ## Installing
 
