@@ -226,4 +226,11 @@ In such a case use the `file_password.toml` to store the key material on disk. D
 
 When the `file_password.toml` is in place, the options for environment variables are not available and the prompt for a password is skipped.
 
+## giant-spellbook tool
+
+There is another tool named [giant-spellbook](https://github.com/jpegleg/giant-spellbook) that is compatible with enchanter because it imports enchanter as a library.
+The encryption and decryption operations can be done with giant-spellbook as well, without any TOML config file.
+
+If you prefer not to have an enchanter.toml, then giant-spellbook is the tool for you.
+
 Enchanter uses [zeroize](https://docs.rs/zeroize/latest/zeroize/) to explicitly empty the key from memory. This technique is generally recommended to avoid the edge case where the compiler optimizes away an important aspect of "zeroizing" a value.
