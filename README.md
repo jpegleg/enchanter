@@ -233,4 +233,6 @@ The encryption and decryption operations can be done with giant-spellbook as wel
 
 If you prefer not to have an enchanter.toml, then giant-spellbook is the tool for you.
 
+## Zeroize 
+
 Enchanter uses [zeroize](https://docs.rs/zeroize/latest/zeroize/) to explicitly empty the key from memory. This technique is generally recommended to avoid the edge case where the compiler optimizes away an important aspect of "zeroizing" a value.
