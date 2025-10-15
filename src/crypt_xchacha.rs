@@ -6,6 +6,7 @@ use chacha20poly1305::{
     aead::{AeadInPlace, KeyInit},
     XChaCha20Poly1305,
 };
+#[allow(deprecated)]
 use chacha20poly1305::aead::generic_array::GenericArray;
 
 use std::fs::File;
