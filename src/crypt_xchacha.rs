@@ -77,6 +77,7 @@ pub fn ciphertext_hash(password: &[u8], file_data: &[u8], length: usize) -> Vec<
 /// Encrypt a file with XChaCha20Poly1305. The function takes an input file, and output, and key to use for
 /// the encryption. A nonce is generated using 8 bytes of time data and 16 random bytes.
 #[allow(unused)]
+#[allow(deprecated)]
 pub fn encrypt_file(input_file: &str, output_file: &str, key: &[u8]) -> Result<(), Box<dyn std::error::Error>> {
     let mut plaintext_file = File::open(input_file)?;
     let mut plaintext = Vec::new();
@@ -100,6 +101,7 @@ pub fn encrypt_file(input_file: &str, output_file: &str, key: &[u8]) -> Result<(
 
 /// Decrypt a file with XChaCha20Poly1305.
 #[allow(unused)]
+#[allow(deprecated)]
 pub fn decrypt_file(input_file: &str, output_file: &str, key: &[u8]) -> Result<(), Box<dyn std::error::Error>> {
     let mut ciphertext_file = File::open(input_file)?;
     let mut ciphertext = Vec::new();
@@ -119,6 +121,7 @@ pub fn decrypt_file(input_file: &str, output_file: &str, key: &[u8]) -> Result<(
 /// The output is any UTF-8 data. If the data is non-UTF-8,
 /// decrypt to a file instead with the decrypt_file function.
 #[allow(unused)]
+#[allow(deprecated)]
 pub fn decrypt_stdout(input_file: &str, key: &[u8]) -> Result<(), Box<dyn std::error::Error>> {
     let mut ciphertext_file = File::open(input_file)?;
     let mut ciphertext = Vec::new();
