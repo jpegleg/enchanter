@@ -34,7 +34,7 @@ const DEP: &[u8] = b"fe3oUFSXweSdjiYDFssoMUgkZ7KfG8p8EhD16HmvkLZ5FB";
 #[allow(unused)]
 pub fn checks(validate: &str, ciphertext_hash: &str) -> bool {
     let result = validate == ciphertext_hash;
-    if result == true {
+    if result {
       return true
     } else {
       println!("{{\n  \"ERROR\": \"Ciphertext and/or password are not as expected. \
@@ -88,14 +88,14 @@ pub fn encrypt_file(input_file: &str, output_file: &str, key: &[u8]) -> Result<(
     let timestamp_nanos = now.as_nanos();
     nonce[0..8].copy_from_slice(&timestamp_nanos.to_le_bytes()[0..8]);
     OsRng.try_fill_bytes(&mut nonce[8..24]);
-    let aead = XChaCha20Poly1305::new(GenericArray::from_slice(&key));
+    let aead = XChaCha20Poly1305::new(GenericArray::from_slice(key));
     let mut ciphertext_file = File::create(output_file)?;
     let mut ciphertext = plaintext.to_vec();
     let tag = aead.encrypt_in_place_detached(&nonce.into(), &[], &mut ciphertext);
     let wtag: &[u8] = &tag.unwrap();
     let mut output = File::create(output_file)?;
     output.write_all(&nonce)?;
-    output.write_all(&wtag)?;
+    output.write_all(wtag)?;
     output.write_all(&ciphertext)?;
     Ok(())
 }
@@ -110,8 +110,8 @@ pub fn decrypt_file(input_file: &str, output_file: &str, key: &[u8]) -> Result<(
     let nonce = chacha20poly1305::XNonce::from_slice(&ciphertext[..24]);
     let tag = GenericArray::clone_from_slice(&ciphertext[24..40]);
     let mut plaintext = ciphertext[40..].to_vec();
-    let aead = XChaCha20Poly1305::new(GenericArray::from_slice(&key));
-    aead.decrypt_in_place_detached(&nonce, &[], &mut plaintext, &tag);
+    let aead = XChaCha20Poly1305::new(GenericArray::from_slice(key));
+    aead.decrypt_in_place_detached(nonce, &[], &mut plaintext, &tag);
 
     let mut plaintext_file = File::create(output_file)?;
     plaintext_file.write_all(&plaintext)?;
@@ -130,10 +130,10 @@ pub fn decrypt_stdout(input_file: &str, key: &[u8]) -> Result<(), Box<dyn std::e
     let nonce = chacha20poly1305::XNonce::from_slice(&ciphertext[..24]);
     let tag = GenericArray::clone_from_slice(&ciphertext[24..40]);
     let mut plaintext = ciphertext[40..].to_vec();
-    let aead = XChaCha20Poly1305::new(GenericArray::from_slice(&key));
-    aead.decrypt_in_place_detached(&nonce, &[], &mut plaintext, &tag);
+    let aead = XChaCha20Poly1305::new(GenericArray::from_slice(key));
+    aead.decrypt_in_place_detached(nonce, &[], &mut plaintext, &tag);
 
-    println!("{}", String::from_utf8_lossy(&plaintext).to_string());
+    println!("{}", String::from_utf8_lossy(&plaintext));
 
     Ok(())
 }
