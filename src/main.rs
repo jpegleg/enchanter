@@ -67,10 +67,10 @@ creation_time = "{}"
     );
     let json_started = false;
     let mut file = try_print_json!(
-        File::create("./enchanter.toml").map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open enchanter.toml: {}", e))),
+        File::create("./enchanter.toml").map_err(|e| io::Error::other(format!("Failed to open enchanter.toml: {}", e))),
         json_started
     );
-    let _ = try_print_json!(
+    try_print_json!(
         file.write_all(config_content.as_bytes()),
         json_started
     );
@@ -101,18 +101,18 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 
       match flag.as_str() {
         "-do" => {
-          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open enchanter.toml: {e}")))?;
+          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::other(format!("Failed to open enchanter.toml: {e}")))?;
           let mut contents = String::new();
-          file.read_to_string(&mut contents).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read enchanter.toml: {e}")))?;
-          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Failed to parse enchanter.toml")))?;
+          file.read_to_string(&mut contents).map_err(|e| io::Error::other(format!("Failed to read enchanter.toml: {e}")))?;
+          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::other(format!("Failed to parse enchanter.toml")))?;
 
           let mut file = File::open(input_file)?;
           let mut nonce = [0u8; 16];
           file.read_exact(&mut nonce)?;
-          let mut km = File::open("./file_password.toml").map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the key material file file_password.toml: {e}")))?;
+          let mut km = File::open("./file_password.toml").map_err(|e| io::Error::other(format!("Failed to open the key material file file_password.toml: {e}")))?;
           let mut kcontents = String::new();
-          km.read_to_string(&mut kcontents).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read file_password.toml: {e}")))?;
-          let kmc: Keyfile = toml::from_str(&kcontents).map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Failed to parse file_password.toml")))?;
+          km.read_to_string(&mut kcontents).map_err(|e| io::Error::other(format!("Failed to read file_password.toml: {e}")))?;
+          let kmc: Keyfile = toml::from_str(&kcontents).map_err(|_| io::Error::other(format!("Failed to parse file_password.toml")))?;
           let kmstring = Some(kmc.enchanter_password);
           let kmbytes = match kmstring {
             Some(s) => s.into_bytes(),
@@ -123,32 +123,32 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
           };
           let mut key = crypt_xchacha::a3(&kmbytes, TUR);
 
-          let mut in_file = File::open(input_file).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the input file {input_file}: {e}")))?;
+          let mut in_file = File::open(input_file).map_err(|e| io::Error::other(format!("Failed to open the input file {input_file}: {e}")))?;
           let mut input_file_data = Vec::new();
-          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read {input_file}: {e}")))?;
+          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::other(format!("Failed to read {input_file}: {e}")))?;
           let validate = crypt_xchacha::ciphertext_hash(&key, &input_file_data, 64);
           let validate_str = BASE64_STANDARD.encode(&validate);
           let checkme = &validate_str;
-          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) == true {
-            crypt_xchacha::decrypt_stdout(input_file, &key).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Decryption failed: {e}")))?;
+          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) {
+            crypt_xchacha::decrypt_stdout(input_file, &key).map_err(|e| io::Error::other(format!("Decryption failed: {e}")))?;
           } else {
             println!("  \"Result\": \"Refusing to decrypt.\"\n}}");
           };
           key.zeroize();
         },
         "-d" => {
-          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open enchanter.toml: {e}")))?;
+          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::other(format!("Failed to open enchanter.toml: {e}")))?;
           let mut contents = String::new();
-          file.read_to_string(&mut contents).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read enchanter.toml: {e}")))?;
-          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Failed to parse enchanter.toml")))?;
+          file.read_to_string(&mut contents).map_err(|e| io::Error::other(format!("Failed to read enchanter.toml: {e}")))?;
+          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::other(format!("Failed to parse enchanter.toml")))?;
 
           let mut file = File::open(input_file)?;
           let mut nonce = [0u8; 16];
           file.read_exact(&mut nonce)?;
-          let mut km = File::open("./file_password.toml").map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the key material file file_password.toml: {e}")))?;
+          let mut km = File::open("./file_password.toml").map_err(|e| io::Error::other(format!("Failed to open the key material file file_password.toml: {e}")))?;
           let mut kcontents = String::new();
-          km.read_to_string(&mut kcontents).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read file_password.toml: {e}")))?;
-          let kmc: Keyfile = toml::from_str(&kcontents).map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Failed to parse file_password.toml")))?;
+          km.read_to_string(&mut kcontents).map_err(|e| io::Error::other(format!("Failed to read file_password.toml: {e}")))?;
+          let kmc: Keyfile = toml::from_str(&kcontents).map_err(|_| io::Error::other(format!("Failed to parse file_password.toml")))?;
           let kmstring = Some(kmc.enchanter_password);
           let kmbytes = match kmstring {
             Some(s) => s.into_bytes(),
@@ -160,14 +160,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 
           let mut key = crypt_xchacha::a3(&kmbytes, TUR);
 
-          let mut in_file = File::open(input_file).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the input file {input_file}: {e}")))?;
+          let mut in_file = File::open(input_file).map_err(|e| io::Error::other(format!("Failed to open the input file {input_file}: {e}")))?;
           let mut input_file_data = Vec::new();
-          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read {input_file}: {e}")))?;
+          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::other(format!("Failed to read {input_file}: {e}")))?;
           let validate = crypt_xchacha::ciphertext_hash(&key, &input_file_data, 64);
           let validate_str = BASE64_STANDARD.encode(&validate);
           let checkme = &validate_str;
-          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) == true {
-            crypt_xchacha::decrypt_file(input_file, output_file, &key).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Decryption failed: {e}")))?;
+          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) {
+            crypt_xchacha::decrypt_file(input_file, output_file, &key).map_err(|e| io::Error::other(format!("Decryption failed: {e}")))?;
             println!("{{\"Result\": \"file decrypted\"}}");
           } else {
             println!("  \"Result\": \"Refusing to decrypt.\"\n}}");
@@ -176,10 +176,10 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 
         },
         "-e" => {
-          let mut km = File::open("./file_password.toml").map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the key material file file_password.toml: {e}")))?;
+          let mut km = File::open("./file_password.toml").map_err(|e| io::Error::other(format!("Failed to open the key material file file_password.toml: {e}")))?;
           let mut kcontents = String::new();
-          km.read_to_string(&mut kcontents).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read file_password.toml: {e}")))?;
-          let kmc: Keyfile = toml::from_str(&kcontents).map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Failed to parse file_password.toml")))?;
+          km.read_to_string(&mut kcontents).map_err(|e| io::Error::other(format!("Failed to read file_password.toml: {e}")))?;
+          let kmc: Keyfile = toml::from_str(&kcontents).map_err(|_| io::Error::other(format!("Failed to parse file_password.toml")))?;
           let kmstring = Some(kmc.enchanter_password);
           let kmbytes = match kmstring {
             Some(s) => s.into_bytes(),
@@ -192,9 +192,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
           let mut key = crypt_xchacha::a3(&kmbytes, TUR);
 
           crypt_xchacha::encrypt_file(input_file, output_file, &key)?;
-          let mut out_file = File::open(output_file).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the output file {output_file}: {e}")))?;
+          let mut out_file = File::open(output_file).map_err(|e| io::Error::other(format!("Failed to open the output file {output_file}: {e}")))?;
           let mut output_file_data = Vec::new();
-          out_file.read_to_end(&mut output_file_data).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read {output_file}: {e}")))?;
+          out_file.read_to_end(&mut output_file_data).map_err(|e| io::Error::other(format!("Failed to read {output_file}: {e}")))?;
           let validate = crypt_xchacha::ciphertext_hash(&key, &output_file_data, 64);
           let validate_str = BASE64_STANDARD.encode(&validate);
           println!("{{\"Validation string\": \"{validate_str}\"}}");
@@ -223,26 +223,26 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 
       match flag.as_str() {
         "-deo" => {
-          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open enchanter.toml: {e}")))?;
+          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::other(format!("Failed to open enchanter.toml: {e}")))?;
           let mut contents = String::new();
-          file.read_to_string(&mut contents).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read enchanter.toml: {e}")))?;
-          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Failed to parse enchanter.toml")))?;
+          file.read_to_string(&mut contents).map_err(|e| io::Error::other(format!("Failed to read enchanter.toml: {e}")))?;
+          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::other(format!("Failed to parse enchanter.toml")))?;
 
           let mut file = File::open(input_file)?;
           let mut nonce = [0u8; 16];
           file.read_exact(&mut nonce)?;
-          let strpassword = env::var("ENC").map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Environment variable ENC not set")))?;
+          let strpassword = env::var("ENC").map_err(|_| io::Error::other(format!("Environment variable ENC not set")))?;
           let password = strpassword.as_bytes();
 
           let mut key = crypt_xchacha::a3(password, TUR);
-          let mut in_file = File::open(input_file).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the input file {input_file}: {e}")))?;
+          let mut in_file = File::open(input_file).map_err(|e| io::Error::other(format!("Failed to open the input file {input_file}: {e}")))?;
           let mut input_file_data = Vec::new();
-          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read {input_file}: {e}")))?;
+          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::other(format!("Failed to read {input_file}: {e}")))?;
           let validate = crypt_xchacha::ciphertext_hash(&key, &input_file_data, 64);
           let validate_str = BASE64_STANDARD.encode(&validate);
           let checkme = &validate_str;
-          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) == true {
-            crypt_xchacha::decrypt_stdout(input_file, &key).map_err(|e|io::Error::new(io::ErrorKind::Other, format!("Decryption failed for {input_file}: {e}")))?;
+          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) {
+            crypt_xchacha::decrypt_stdout(input_file, &key).map_err(|e|io::Error::other(format!("Decryption failed for {input_file}: {e}")))?;
           } else {
             println!("  \"Result\": \"Refusing to decrypt.\"\n}}");
           };
@@ -250,10 +250,10 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 
         },
         "-do" => {
-          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open enchanter.toml: {e}")))?;
+          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::other(format!("Failed to open enchanter.toml: {e}")))?;
           let mut contents = String::new();
-          file.read_to_string(&mut contents).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read enchanter.toml: {e}")))?;
-          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Failed to parse enchanter.toml")))?;
+          file.read_to_string(&mut contents).map_err(|e| io::Error::other(format!("Failed to read enchanter.toml: {e}")))?;
+          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::other(format!("Failed to parse enchanter.toml")))?;
 
           let mut file = File::open(input_file)?;
           let mut nonce = [0u8; 16];
@@ -263,14 +263,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
           let password = read_password()?;
           let bpassword = password.as_bytes();
           let mut key = crypt_xchacha::a3(bpassword, TUR);
-          let mut in_file = File::open(input_file).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the input file {input_file}: {e}")))?;
+          let mut in_file = File::open(input_file).map_err(|e| io::Error::other(format!("Failed to open the input file {input_file}: {e}")))?;
           let mut input_file_data = Vec::new();
-          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read {input_file}: {e}")))?;
+          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::other(format!("Failed to read {input_file}: {e}")))?;
           let validate = crypt_xchacha::ciphertext_hash(&key, &input_file_data, 64);
           let validate_str = BASE64_STANDARD.encode(&validate);
           let checkme = &validate_str;
-          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) == true {
-            crypt_xchacha::decrypt_stdout(input_file, &key).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Decryption failed: {e}")))?;
+          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) {
+            crypt_xchacha::decrypt_stdout(input_file, &key).map_err(|e| io::Error::other(format!("Decryption failed: {e}")))?;
           } else {
             println!("  \"Result\": \"Refusing to decrypt.\"\n}}");
           };
@@ -278,25 +278,25 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 
         },
         "-de" => {
-          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open enchanter.toml: {e}")))?;
+          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::other(format!("Failed to open enchanter.toml: {e}")))?;
           let mut contents = String::new();
-          file.read_to_string(&mut contents).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read enchanter.toml: {e}")))?;
-          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Failed to parse enchanter.toml")))?;
+          file.read_to_string(&mut contents).map_err(|e| io::Error::other(format!("Failed to read enchanter.toml: {e}")))?;
+          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::other(format!("Failed to parse enchanter.toml")))?;
 
           let mut file = File::open(input_file)?;
           let mut nonce = [0u8; 16];
           file.read_exact(&mut nonce)?;
-          let strpassword = env::var("ENC").map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Environment variable ENC not set")))?;
+          let strpassword = env::var("ENC").map_err(|_| io::Error::other(format!("Environment variable ENC not set")))?;
           let password = strpassword.as_bytes();
           let mut key = crypt_xchacha::a3(password, TUR);
-          let mut in_file = File::open(input_file).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the input file {input_file}: {e}")))?;
+          let mut in_file = File::open(input_file).map_err(|e| io::Error::other(format!("Failed to open the input file {input_file}: {e}")))?;
           let mut input_file_data = Vec::new();
-          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read {input_file}: {e}")))?;
+          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::other(format!("Failed to read {input_file}: {e}")))?;
           let validate = crypt_xchacha::ciphertext_hash(&key, &input_file_data, 64);
           let validate_str = BASE64_STANDARD.encode(&validate);
           let checkme = &validate_str;
-          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) == true {
-            crypt_xchacha::decrypt_file(input_file, output_file, &key).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Decryption failed: {e}")))?;
+          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) {
+            crypt_xchacha::decrypt_file(input_file, output_file, &key).map_err(|e| io::Error::other(format!("Decryption failed: {e}")))?;
             println!("{{\"Result\": \"file decrypted\"}}");
           } else {
             println!("  \"Result\": \"Refusing to decrypt.\"\n}}");
@@ -305,10 +305,10 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 
         },
         "-d" => {
-          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open enchanter.toml: {e}")))?;
+          let mut file = File::open("./enchanter.toml").map_err(|e| io::Error::other(format!("Failed to open enchanter.toml: {e}")))?;
           let mut contents = String::new();
-          file.read_to_string(&mut contents).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read enchanter.toml: {e}")))?;
-          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Failed to parse enchanter.toml")))?;
+          file.read_to_string(&mut contents).map_err(|e| io::Error::other(format!("Failed to read enchanter.toml: {e}")))?;
+          let config: Config = toml::from_str(&contents).map_err(|_| io::Error::other(format!("Failed to parse enchanter.toml")))?;
 
           let mut file = File::open(input_file)?;
           let mut nonce = [0u8; 16];
@@ -319,14 +319,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
           let password = read_password()?;
           let bpassword = password.as_bytes();
           let mut key = crypt_xchacha::a3(bpassword, TUR);
-          let mut in_file = File::open(input_file).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the input file {input_file}: {e}")))?;
+          let mut in_file = File::open(input_file).map_err(|e| io::Error::other(format!("Failed to open the input file {input_file}: {e}")))?;
           let mut input_file_data = Vec::new();
-          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read {input_file}: {e}")))?;
+          in_file.read_to_end(&mut input_file_data).map_err(|e| io::Error::other(format!("Failed to read {input_file}: {e}")))?;
           let validate = crypt_xchacha::ciphertext_hash(&key, &input_file_data, 64);
           let validate_str = BASE64_STANDARD.encode(&validate);
           let checkme = &validate_str;
-          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) == true {
-            crypt_xchacha::decrypt_file(input_file, output_file, &key).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Decryption failed: {e}")))?;
+          if crypt_xchacha::checks(checkme, &config.ciphertext_hash) {
+            crypt_xchacha::decrypt_file(input_file, output_file, &key).map_err(|e| io::Error::other(format!("Decryption failed: {e}")))?;
             println!("{{\"Result\": \"file decrypted\"}}");
           } else {
             println!("  \"Result\": \"Refusing to decrypt.\"\n}}");
@@ -335,13 +335,13 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 
         },
         "-ee" => {
-          let password = env::var("ENC").map_err(|_| io::Error::new(io::ErrorKind::Other, format!("Environment variable ENC not set")))?;
+          let password = env::var("ENC").map_err(|_| io::Error::other(format!("Environment variable ENC not set")))?;
           let bpassword = password.as_bytes();
           let mut key = crypt_xchacha::a3(bpassword, TUR);
           crypt_xchacha::encrypt_file(input_file, output_file, &key)?;
-          let mut out_file = File::open(output_file).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the output file {output_file}: {e}")))?;
+          let mut out_file = File::open(output_file).map_err(|e| io::Error::other(format!("Failed to open the output file {output_file}: {e}")))?;
           let mut output_file_data = Vec::new();
-          out_file.read_to_end(&mut output_file_data).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read {output_file}: {e}")))?;
+          out_file.read_to_end(&mut output_file_data).map_err(|e| io::Error::other(format!("Failed to read {output_file}: {e}")))?;
           let validate = crypt_xchacha::ciphertext_hash(&key, &output_file_data, 64);
           let validate_str = BASE64_STANDARD.encode(&validate);
           println!("{{\"Validation string\": \"{validate_str}\"}}");
@@ -356,9 +356,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
           let bpassword = password.as_bytes();
           let mut key = crypt_xchacha::a3(bpassword, TUR);
           crypt_xchacha::encrypt_file(input_file, output_file, &key)?;
-          let mut out_file = File::open(output_file).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to open the output file {output_file}: {e}")))?;
+          let mut out_file = File::open(output_file).map_err(|e| io::Error::other(format!("Failed to open the output file {output_file}: {e}")))?;
           let mut output_file_data = Vec::new();
-          out_file.read_to_end(&mut output_file_data).map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to read {output_file}: {e}")))?;
+          out_file.read_to_end(&mut output_file_data).map_err(|e| io::Error::other(format!("Failed to read {output_file}: {e}")))?;
           let validate = crypt_xchacha::ciphertext_hash(&key, &output_file_data, 64);
           let validate_str = BASE64_STANDARD.encode(&validate);
           println!("{{\"Validation string\": \"{validate_str}\"}}");
